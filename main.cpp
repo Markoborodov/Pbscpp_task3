@@ -15,7 +15,20 @@ public:
     }
 };
 
+template <class T, class S>
+struct custom_allocator {
+    typedef T value_type;
+    custom_allocator() {}
+    template <class U, class P> custom_allocator (const custom_allocator<U, P>&) {}
+    T* allocate (std::size_t n) {
+        S::operator new(n * sizeof(T));
+    }
+    void deallocate (T* p, std::size_t n) {
+        S::operator delete(p, n * sizeof(T));
+    }
+};
+
 int main()
 {
-    auto sp = std::make_shared<A>();
+    auto sp = std::allocate_shared<A>(custom_allocator<A, A>());
 }
